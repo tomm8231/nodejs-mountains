@@ -2,6 +2,10 @@ const express = require("express")
 
 const app = express()
 
+app.use(express.json())
+
+let count = 10
+
 const mountains = [
     { id: 1, name: "Kangchenjunga", height: 8586 },
     { id: 2, name: "K2", height: 8611 },
@@ -16,20 +20,75 @@ const mountains = [
 ]
 
 app.get("/mountains", (req, res) => {
-    const allMountains = mountains.map(mountain => ({
-        id: mountain.id,
-        name: mountain.name,
-        height: mountain.height
-    }))
-    
-    res.send(allMountains)
+    res.send({ data: mountains })
 })
 
 app.get("/mountains/:id", (req, res) => {
-    const {id} = req.params
-    const mountainById = mountains[id - 1]
+    const pathVariableMountainId = Number(req.params.id)
 
-    res.send(mountainById)
+    if (!pathVariableMountainId) {
+        res.send({ error: "Mountain id must be a number" })
+    } else {
+        const mountainFoundById = mountains.find((mountain) => mountain.id === pathVariableMountainId)
+        res.send({ data: mountainFoundById })
+    }
 })
 
-app.listen(8080)
+
+app.post("/mountains", (req, res) => {
+    const newMountain = {
+        "id": count + 1,
+        "name": req.body.name,
+        "height": req.body.height
+    }
+
+    count++
+
+    mountains.push(newMountain)
+    res.send({newMountain})
+})
+
+app.delete("/mountains/:id", (req, res) => {
+    const pathVariableMountainId = Number(req.params.id)
+    const mountainFound = mountains.find((mountain) => mountain.id === pathVariableMountainId)
+
+    if (!pathVariableMountainId || pathVariableMountainId < 1) {
+        res.send({ error: "Mountain ID must be a number above 0" })
+
+    } else if (!mountainFound) {
+        res.send({ error: "No mountain found with that ID" })
+
+    } else {
+        const index = mountains.indexOf(mountainFound)
+        mountains.splice(index, 1)
+        res.send(mountainFound.name + " deleted")
+    }
+})
+
+app.put("/mountains/:id", (req, res) => {
+    const pathVariableMountainId = Number(req.params.id)
+    const mountainFound = mountains.find((mountain) => mountain.id === pathVariableMountainId)
+    const index = mountains.indexOf(mountainFound)
+
+    if (!pathVariableMountainId || pathVariableMountainId < 1) {
+        res.send({ error: "Mountain ID must be a number above 0" })
+    } else if (!mountainFound) {
+        res.send({ error: "No mountain found with that ID"})
+    } else {
+        mountains[index].id = pathVariableMountainId
+        mountains[index].name = req.body.name
+        mountains[index].height = req.body.height
+
+        res.send({mountainFound})
+    }
+})
+
+
+const PORT = 8080
+app.listen(PORT, (error) => {
+    if (error) {
+        console.log("Error starting on the server...", error)
+        return
+    }
+    console.log("Server is running on port", 8080);
+})
