@@ -35,7 +35,7 @@ app.get("/mountains/:id", (req, res) => {
         res.send({ error: "No mountain found with that ID" })
 
     } else {
-        res.send({ data: mountainFoundById })
+        res.send({ data: mountainFound })
     }
 })
 
@@ -46,11 +46,11 @@ app.post("/mountains", (req, res) => {
         "name": req.body.name,
         "height": req.body.height
     }
-
+    
     count++
 
     mountains.push(newMountain)
-    res.send({newMountain})
+    res.send({ data: newMountain})
 })
 
 app.delete("/mountains/:id", (req, res) => {
@@ -66,7 +66,7 @@ app.delete("/mountains/:id", (req, res) => {
     } else {
         const index = mountains.indexOf(mountainFound)
         mountains.splice(index, 1)
-        res.send(mountainFound.name + " deleted")
+        res.send({ data: mountainFound })
     }
 })
 
@@ -85,10 +85,25 @@ app.put("/mountains/:id", (req, res) => {
         mountains[index].id = pathVariableMountainId
         mountains[index].name = req.body.name
         mountains[index].height = req.body.height
-
-        res.send({mountainFound})
+        res.send({ data: mountainFound })
     }
 })
+
+app.patch("/mountains/:id", (req, res) => {
+    const pathVariableMountainId = Number(req.params.id);
+    const mountainFound = mountains.find((mountain) => mountain.id === pathVariableMountainId);
+
+    if (!pathVariableMountainId || pathVariableMountainId < 1) {
+        res.send({ error: "Mountain ID must be a number above 0" })
+
+    } else if (!mountainFound) {
+        res.send({ error: "No mountain found with that ID"})
+
+    } else {
+        Object.assign(mountainFound, req.body);
+        res.send({ data: mountainFound });
+    }
+});
 
 
 const PORT = 8080
