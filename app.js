@@ -46,11 +46,11 @@ app.post("/mountains", (req, res) => {
         "name": req.body.name,
         "height": req.body.height
     }
-    
+
     count++
 
     mountains.push(newMountain)
-    res.send({ data: newMountain})
+    res.send({ data: newMountain })
 })
 
 app.delete("/mountains/:id", (req, res) => {
@@ -79,7 +79,7 @@ app.put("/mountains/:id", (req, res) => {
         res.send({ error: "Mountain ID must be a number above 0" })
 
     } else if (!mountainFound) {
-        res.send({ error: "No mountain found with that ID"})
+        res.send({ error: "No mountain found with that ID" })
 
     } else {
         mountains[index].id = pathVariableMountainId
@@ -97,7 +97,7 @@ app.patch("/mountains/:id", (req, res) => {
         res.send({ error: "Mountain ID must be a number above 0" })
 
     } else if (!mountainFound) {
-        res.send({ error: "No mountain found with that ID"})
+        res.send({ error: "No mountain found with that ID" })
 
     } else {
         Object.assign(mountainFound, req.body);
