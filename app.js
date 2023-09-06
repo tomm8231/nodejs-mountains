@@ -25,11 +25,16 @@ app.get("/mountains", (req, res) => {
 
 app.get("/mountains/:id", (req, res) => {
     const pathVariableMountainId = Number(req.params.id)
+    const mountainFound = mountains.find((mountain) => mountain.id === pathVariableMountainId)
 
-    if (!pathVariableMountainId) {
-        res.send({ error: "Mountain id must be a number" })
+
+    if (!pathVariableMountainId || pathVariableMountainId < 1) {
+        res.send({ error: "Mountain id must be a number above 0" })
+
+    } else if (!mountainFound) {
+        res.send({ error: "No mountain found with that ID" })
+
     } else {
-        const mountainFoundById = mountains.find((mountain) => mountain.id === pathVariableMountainId)
         res.send({ data: mountainFoundById })
     }
 })
@@ -72,8 +77,10 @@ app.put("/mountains/:id", (req, res) => {
 
     if (!pathVariableMountainId || pathVariableMountainId < 1) {
         res.send({ error: "Mountain ID must be a number above 0" })
+
     } else if (!mountainFound) {
         res.send({ error: "No mountain found with that ID"})
+
     } else {
         mountains[index].id = pathVariableMountainId
         mountains[index].name = req.body.name
