@@ -42,31 +42,25 @@ app.get("/mountains/:id", (req, res) => {
 
 app.post("/mountains", (req, res) => {
     const newMountain = {
-        "id": count + 1,
+        "id": ++count,
         "name": req.body.name,
         "height": req.body.height
     }
-
-    count++
-
+    
     mountains.push(newMountain)
     res.send({ data: newMountain })
 })
 
 app.delete("/mountains/:id", (req, res) => {
     const pathVariableMountainId = Number(req.params.id)
-    const mountainFound = mountains.find((mountain) => mountain.id === pathVariableMountainId)
+    const indexFound = mountains.findIndex((mountain) => mountain.id === pathVariableMountainId)
 
-    if (!pathVariableMountainId || pathVariableMountainId < 1) {
-        res.send({ error: "Mountain ID must be a number above 0" })
-
-    } else if (!mountainFound) {
-        res.send({ error: "No mountain found with that ID" })
+    if (indexFound === -1) {
+        res.status(404).send({ error: "No mountain found with that ID" })
 
     } else {
-        const index = mountains.indexOf(mountainFound)
-        mountains.splice(index, 1)
-        res.send({ data: mountainFound })
+        mountains.splice(indexFound, 1)
+        res.send({ data: pathVariableMountainId })
     }
 })
 
@@ -91,17 +85,15 @@ app.put("/mountains/:id", (req, res) => {
 
 app.patch("/mountains/:id", (req, res) => {
     const pathVariableMountainId = Number(req.params.id);
-    const mountainFound = mountains.find((mountain) => mountain.id === pathVariableMountainId);
+    let foundIndex = mountains.findIndex((mountain) => mountain.id === pathVariableMountainId);
 
-    if (!pathVariableMountainId || pathVariableMountainId < 1) {
-        res.send({ error: "Mountain ID must be a number above 0" })
-
-    } else if (!mountainFound) {
-        res.send({ error: "No mountain found with that ID" })
+    if (foundIndex === -1) {
+        res.status(404).send({ error: "No mountain found with that ID" })
 
     } else {
-        Object.assign(mountainFound, req.body);
-        res.send({ data: mountainFound });
+        mountains[foundIndex] = { ...mountains[foundIndex], ...req.body, id: pathVariableMountainId }
+
+        res.send({ data: mountains[foundIndex] })
     }
 });
 
